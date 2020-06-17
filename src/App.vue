@@ -4,20 +4,17 @@
     <h1 class="text-center">NameGator</h1>
   </div>
   <div id="main">
-    <DomainList></DomainList>
+    <router-view></router-view>
   </div>
 </div>
 </template>
 
 <script>
 import "font-awesome/css/font-awesome.css";
-import DomainList from "./components/DomainList";
 
 export default {
   name: "App",
-  components: {
-    DomainList
-  }
+  components: {}
 };
 </script>
 
