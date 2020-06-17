@@ -38,6 +38,7 @@
 <script>
 import "font-awesome/css/font-awesome.css";
 import AppItemList from "./AppItemList";
+import axios from "axios/dist/axios"
 
 export default {
   name: "App",
@@ -46,22 +47,150 @@ export default {
   },
 	data() {
 		return {
-			prefixes: ["Air", "Jet", "Fligth"],
-			sufixes: ["Hub", "Station", "Mart"]
+			prefixes: [],
+			sufixes: []
 		};
 	},
   methods: {
     addPrefix(prefix){
-      this.prefixes.push(prefix)
+      axios({
+        url: "http://localhost:3333",
+        method: "post",
+        data: {
+          query: `
+            mutation ($data: inputItem!){
+              saveItem(data: $data){
+                id 
+                type 
+                description
+              }
+            }
+          `,
+          variables: {
+            data: {
+              type: "prefix",
+              description: prefix
+            }
+          }
+        }
+      }).then(response => {
+        this.prefixes.push(response.data.data.saveItem)
+      })
     },
     addSufix(sufix){
-      this.sufixes.push(sufix)
+      axios({
+        url: "http://localhost:3333",
+        method: "post",
+        data: {
+          query: `
+            mutation ($data: inputItem!){
+              saveItem(data: $data){
+                id 
+                type 
+                description
+              }
+            }
+          `,
+          variables: {
+            data: {
+              type: "sufix",
+              description: sufix
+            }
+          }
+        }
+      }).then(response => {
+        this.sufixes.push(response.data.data.saveItem)
+      })
     },
     deletePrefix(prefix){
-      this.prefixes.splice(this.prefixes.indexOf(prefix), 1)
+      axios({
+        url: "http://localhost:3333",
+        method: "post",
+        data: {
+          query: `
+            mutation ($data: idItem!){
+              deleteItem(data: $data){
+                id 
+                type 
+                description
+              }
+            }
+          `,
+          variables: {
+            data: {
+              id: prefix,
+              type: "prefix"
+            }
+          }
+        }
+      }).then(response => {
+        if(response.status == 200){
+          this.getPrefixes()
+        }
+      })
     },
     deleteSufix(sufix){
-      this.sufixes.splice(this.sufixes.indexOf(sufix), 1)
+      axios({
+        url: "http://localhost:3333",
+        method: "post",
+        data: {
+          query: `
+            mutation ($data: idItem!){
+              deleteItem(data: $data){
+                id 
+                type 
+                description
+              }
+            }
+          `,
+          variables: {
+            data: {
+              id: sufix,
+              type: "sufix"
+            }
+          }
+        }
+      }).then(response => {
+        if(response.status == 200){
+          this.getSufixes()
+        }
+      })
+    },
+    getPrefixes(){
+      axios({
+        url: "http://localhost:3333",
+        method: "post",
+        data: {
+          query: `
+            {
+              prefixes{
+                id type description
+              }
+            }
+          `
+        }
+      }).then(response => {
+        const query = response.data
+        this.prefixes = query.data.prefixes
+      })
+    },
+    getSufixes(){
+      axios({
+        url: "http://localhost:3333",
+        method: "post",
+        data: {
+          query: `
+            {
+              sufixes{
+                id type description
+              }
+            }
+          `
+        }
+      }).then(response => {
+        const query = response.data
+        this.sufixes = query.data.sufixes
+      })
     }
   },
   computed: {
@@ -69,11 +198,15 @@ export default {
       const domains = []
       for( const prefix of this.prefixes ){
         for( const sufix of this.sufixes ){
-          domains.push(prefix + sufix)
+          domains.push(prefix.description + sufix.description)
         }
       }
       return domains
     },
+  },
+  created(){
+    this.getPrefixes()
+    this.getSufixes()
   }
 };
 </script>

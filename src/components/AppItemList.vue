@@ -7,11 +7,11 @@
     <div class="card">
       <div class="card-body">
         <ul class="list-group">
-          <li class="list-group-item" v-for="item in items" v-bind:key="item">
+          <li class="list-group-item" v-for="item in items" v-bind:key="item.id">
             <div class="row">
-              <div class="col-md">{{ item }}</div>
+              <div class="col-md">{{ item.description }}</div>
               <div class="col-md text-right">
-                <button class="btn btn-info" v-on:click="deleteItem(item)">
+                <button class="btn btn-info" v-on:click="deleteItem(item.id)">
                   <span class="fa fa-trash"></span>
                 </button>
               </div>
@@ -52,9 +52,9 @@ export default {
       this.$emit("addItem", item);
       this.item = "";
 	},
-	deleteItem(item){
-		this.$emit("deleteItem", item);
-	}
+    deleteItem(item){
+      this.$emit("deleteItem", item);
+    }
   }
 };
 </script>
